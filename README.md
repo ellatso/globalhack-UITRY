@@ -1,13 +1,4 @@
-Yep—I looked at your repo. Two key points:
 
-1. **This repo is Create React App (CRA), not Vite.**
-   So your teammate should run **`npm start`** (port 3000), not `npm run dev`. And CRA uses env vars that start with **`REACT_APP_`** (but I already made the frontend read both `VITE_API_URL` and `REACT_APP_API_URL`, so you’re safe if you include either).
-
-2. What’s missing is just **clear setup docs + a sample `.env`**. You don’t need to push `node_modules`.
-
-Here’s a drop-in README section you can paste so your teammate can open it on their PC with zero guesswork:
-
----
 
 # PsyCoach UI – Local Setup
 
