@@ -1,70 +1,96 @@
-# Getting Started with Create React App
+Yep—I looked at your repo. Two key points:
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+1. **This repo is Create React App (CRA), not Vite.**
+   So your teammate should run **`npm start`** (port 3000), not `npm run dev`. And CRA uses env vars that start with **`REACT_APP_`** (but I already made the frontend read both `VITE_API_URL` and `REACT_APP_API_URL`, so you’re safe if you include either).
 
-## Available Scripts
+2. What’s missing is just **clear setup docs + a sample `.env`**. You don’t need to push `node_modules`.
 
-In the project directory, you can run:
+Here’s a drop-in README section you can paste so your teammate can open it on their PC with zero guesswork:
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+# PsyCoach UI – Local Setup
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Prereqs
 
-### `npm test`
+* Node.js 18+ and npm
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+  ```
+  node -v
+  npm -v
+  ```
 
-### `npm run build`
+## 1) Install deps
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+npm install
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 2) Environment variables
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Create a file named **`.env`** in the project root (same folder as `package.json`) with:
 
-### `npm run eject`
+```
+# Backend URL (FastAPI)
+REACT_APP_API_URL=http://localhost:8000
+# Kept for compatibility if using Vite later
+VITE_API_URL=http://localhost:8000
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+> After editing `.env`, **restart** the dev server—env vars load only at startup.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 3) Start the frontend (CRA)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```
+npm start
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Open [http://localhost:3000](http://localhost:3000)
 
-## Learn More
+## 4) Start the backend (on the same PC)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+From the folder that has `api.py` and `voice.py`:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
+pip install fastapi uvicorn pydantic python-multipart aiofiles
+# If using STT/TTS endpoints also:
+# pip install av soundfile faster-whisper pyttsx3
+# And install ffmpeg (ffmpeg -version should print a version)
 
-### Code Splitting
+uvicorn api:app --reload --port 8000
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Verify [http://localhost:8000/docs](http://localhost:8000/docs) shows the PsyCoach API.
 
-### Analyzing the Bundle Size
+## 5) Test from the UI
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+* Click **Create Session** → you should see a `sessionId`.
+* Optional: use the mic (needs ffmpeg + audio deps on backend).
 
-### Making a Progressive Web App
+## Troubleshooting
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+* **“Cannot read properties of undefined (reading 'VITE\_API\_URL')”**
+  Restart `npm start`. Ensure `.env` exists and contains the lines above.
+* **405 Method Not Allowed on `/voice/*`**
+  Make sure the UI is sending **POST** (don’t open those URLs directly in the browser).
+* **Mic upload fails / STT errors**
+  Install ffmpeg and audio deps on backend, then reopen the terminal:
 
-### Advanced Configuration
+  ```
+  ffmpeg -version
+  ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+---
 
-### Deployment
+Also add a tiny **`.env.example`** to the repo so teammates just copy it:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```
+REACT_APP_API_URL=http://localhost:8000
+VITE_API_URL=http://localhost:8000
+```
 
-### `npm run build` fails to minify
+If you want, I can PR your repo with:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+* `README.md` update,
+* `.env.example`,
+* (optional) install script for deps.
